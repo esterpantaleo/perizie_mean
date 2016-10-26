@@ -2,12 +2,11 @@
 
 ##INSTRUCTIONS
 1. Download the git repository
-2. cd into the repository
-3. ```cd``` into folder ```server```
-4. ```npm install```
-5. eventually run ```bower install angular-sanitize --save``` and other libraries
-6. run ```node appp.js```
-7. point your browser to ```http://localhost:3000```
+2. Navigate to the ```server``` directory in the ```perizie_mean`` directory
+3. Run ```npm install```
+4. Eventually run ```bower install angular-sanitize --save``` and other libraries
+5. Run ```node appp.js```
+6. Point your browser to ```http://localhost:3000```
 
 ##ADD USER
 ~~~~
