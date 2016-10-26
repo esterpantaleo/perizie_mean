@@ -1,0 +1,44 @@
+<h1>Ricerca Perizie</h1>
+<form  ng-controller="ricercaController as ctrl" name="ctrl.ricerca_form">  
+
+  <p>Inserisci il nome del file che cerchi nel database: <input type="text" name="input" ng.model="ctrl.filename" ng-pattern="ctrl.parola" required ng-trim="false"/></p>
+  <div role="alert">
+    <span class="error" ng-show="ctrl.ricerca_form.input.$error.required">
+      E' necessario inserire il nome di un file!</span>
+    <span class="error" ng-show="ctrl.ricerca_form.input.$error.pattern">
+      E' richiesto un file .pdf!</span>
+  </div>
+  <a type="submit" class="btn btn-default" ng-click="ctrl.visualizzaPerizia()">Visualizza</a>
+  <hr>
+  <div ng-show="ctrl.visPerizia">   
+  <h1>Dati perizia</h1>
+<table class="table"><tr>
+    <td style="border-top: none !important">Provincia:</td><td style="border-top: none !important">{{ctrl.perizia.Provincia}}</td><td style="border-top: none !important">Comune:</td><td style="border-top: none !important">{{ctrl.perizia.Comune}}</td><td style="border-top: none !important">CAP:</td><td style="border-top: none !important">{{ctrl.perizia.CAP}}</td><td style="border-top: none !important">Indirizzo:</td><td style="border-top: none !important">{{ctrl.perizia.Indirizzo}}</td><td style="border-top: none !important">N.civico:</td><td style="border-top: none !important">{{ctrl.perizia.N_civico}}</td>
+  </tr>
+  <br/><br/>
+  <table class="table table-bordered table-sm table-condensed">
+    <tr>
+      <td>Data</td><td>{{ctrl.perizia.Data | date: "dd/MM/yyyy"}}</td>
+    </tr><tr>
+      <td>Tipologia edilizia</td><td>{{ctrl.perizia.Tipologia_edilizia}}</td>
+    </tr><tr>
+      <td> Superficie Commerciale (mq)</td><td>{{ctrl.perizia.SUPERFICIE_COMMERCIALE_MQ}}</td>
+      </tr><tr>
+      <td>Valore di mercato</td><td>{{ctrl.perizia.Valore_di_mercato_del_lotto}}</td>
+      </tr><tr>
+  <td>Anno di costruzione </td><td>{{ctrl.perizia.Anno_di_costruzione}}</td>
+</tr><tr>
+      <td>Impianto elettrico - Vetusta' Anni</td><td> {{ctrl.perizia.Impianto_elettrico_Vetusta_anni}}</td>
+      </tr><tr>
+      <td>Inpianto Idraulico - Vetusta' Anni</td><td>{{ctrl.perizia.Impianto_idraulico_Vetusta_anni}}</td>
+      </tr><tr>
+      <td>Sup. Sec. Cantina</td><td>{{ctrl.perizia.cantina}}</td>
+      </tr><tr>
+      <td>Sup. Sec. Balcone</td><td>{{ctrl.perizia.balcone}}</td>
+      </tr><tr>
+      <td>Sup. Sec. Portico</td><td>{{ctrl.perizia.portico}}</td>
+</tr>
+</table>
+  <div/>   
+</form>
+  

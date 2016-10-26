@@ -1,0 +1,26 @@
+
+  <div ng-controller="uploadController as vis">
+    <form>
+      <h1>Dati perizia ester.pdf</h1>    
+      Data {{vis.data}}
+      <br>
+      Indirizzo {{vis.indirizzo}}
+      <br>
+      Tipologia {{vis.tipologia}}
+      <br/><br/><br/><br/>
+      Cerca perizie 
+      <br>
+      nel raggio di <input type="number" ng-model="vis.distanza" ng-init="vis.distanza='5'"> Km
+      successive alla data <input type="date" ng-model="vis.data" placeholder="dd/MM/yyyy" ng-init="vis.date='01/01/2014'">
+
+      distanza {{vis.distanza}}
+      date  {{vis.date}}
+<br/>
+      <a ng-click='cercaPerizia()' class="btn btn-default">Cerca</a><br/><br/><br/>
+      <a ng-click='stampaPerizie()' class="btn btn-default">Stampa</a><br/><br/><br/>
+
+      <a ng-click='logout()' class="btn btn-default">Logout</a>
+    </form>
+  </div>
+
+

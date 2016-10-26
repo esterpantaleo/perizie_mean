@@ -1,0 +1,128 @@
+<form  ng-controller="uploadController as up" name="up.upload_form">
+
+
+
+    <div ng-show="up.parte1">
+        <h1>Carica Perizia</h1>
+        <hr>
+        Scegli il file della perizia:
+        <input type="file" ngf-select ng-model="up.file" 
+	    name="file" ngf-pattern="'application/pdf'"
+	    accept="application/pdf" ngf-max-size="20MB"
+	    style="display: none" id="selectedFile"/>
+        <a ng-click="up.cerca()" type="submit" class="btn btn-default">Cerca<a/>
+        <!--Image thumbnail: <img style="width:100px;" ng-show="!!up.file" ngf-thumbnail="up.file || '/thumb.jpg'"/> -->
+        <!--<i ng-if="up.upload_form.file.name.size">Il file {{up.file.name}} e' stato scelto</i>-->
+        <p ng-show="up.cercata">Il file selezionato e' {{up.file.name}}. <br/>Clicca su Salva per aggiungerlo al database.</p>  
+        <a ng-show="up.cercata" type="submit" class="btn btn-default" ng-click="up.submit()">Salva</a>
+        <p ng-show="up.submitted">Il file selezionato e' stato salvato</p>
+        <i ng-show="up.upload_form.file.$error.required" >*campo obbligatorio</i><br>
+
+        <i ng-show="up.upload_form.file.$error.maxSize">Il file e' troppo grande {{up.file.size / 1000000|number:1}}MB, la dimensione massima possibile e' 20MB</i>
+
+        <a ng-show="(up.cercata && up.submitted && !up.perizia.filename.size)" type="submit" class="btn btn-default" ng-click="up.visualizzaPerizia()">Visualizza</a> 
+    </div>
+
+
+    <div ng-show="up.parte2">
+        <h1>Dati perizia</h1>
+        <hr>
+        <br style="line-height:0.5em">   
+        <div style="outline:1px solid green;">
+          {{up.perizia.Data | date: "dd/MM/yyyy"}} - {{up.perizia.Tipologia_edilizia}} - {{up.perizia.SUPERFICIE_COMMERCIALE_MQ}}</div>
+	<br style="line-height:1.5em">
+        <div style="text-indent: 3em;">{{up.perizia.Valore_di_mercato_del_lotto}}&#8364;</div>
+        <div style="text-indent: 3em;"> Provincia: {{up.perizia.Provincia}}&emsp;Comune: {{up.perizia.Comune}}&emsp;CAP: {{up.perizia.CAP}}&emsp;Indirizzo: {{up.perizia.Indirizzo}} N.Civico: {{up.perizia.N_civico}}</div>
+        <hr>
+        Cerca perizie successive alla data <input type="date" ng-model="up.DATA_MIN" placeholder="dd-MM-yyyy" required> nel raggio di <input type="number" ng-model="up.DISTANZA" placeholder={{up.DISTANZA}}> Km da {{up.perizia.Indirizzo}} {{up.perizia.N_civico}}, {{up.perizia.Comune}}, {{up.perizia.CAP}} {{up.perizia.Provincia}}
+        </br>
+        <div role="alert">
+            <span class="error" ng-show="upload_form.input.$error.required">Required!</span>
+            <span class="error" ng-show="upload.input.$error.date">Not a valid date!</span>
+        </div>
+        <a ng-click="up.cercaPerizie()" class="btn btn-default">Cerca</a>
+        <div ng-show="up.cercate">
+	    <br/> 
+            <div ng-repeat="p in up.perizie">
+	        <hr>
+	        <input type="checkbox" ng-model="p.selected">
+                <span ng-bind-template="{{p.Data | date: 'dd/MM/yyyy'}} - {{p.Tipologia_edilizia}} - {{p.Superficie}}" style="outline:1px solid blue;"></span>
+	        <div style="text-indent: 3em;" ng-bind-template="{{p.Valore_di_mercato_del_lotto}}&#8364;"/>  
+                <div style="text-indent: 3em;" ng-bind-template="Provincia: {{p.Provincia}}&emsp;Comune: {{p.Comune}}&emsp;CAP: {{p.CAP}}&emsp;Indirizzo: {{p.Indirizzo}}&emsp;N.civico: {{p.N_civico}}"/>       
+            </div>
+	    <hr>
+	    <a ng-show="!up.tabella" ng-click="up.creaTabella()" class="btn btn-default">Crea tabella</a>
+            <div id="tabella" ng-show="up.tabella">
+	      <table class="table table-bordered table-condensed" style="width:100%; border-color: black !important">
+		<thead>
+	      <tr>
+		<th style="border-color: black !important">prezzo e caratteristica</th>
+		<th style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span>immobile di confronto {{$index + 1}}</span>
+		</th>
+		<th style="border-color: black !important">immobile da stimare</th>
+	      </tr>
+		</thead>
+		<tbody>
+	      <tr>
+		<td style="border-color: black !important">Prezzo Di Mercato (Euro)</td>
+		<td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span ng-bind-template="{{p.Valore_di_mercato_del_lotto}}"></span>
+		</td>
+		<td style="border-color: black !important">{{up.perizia.Valore_di_mercato_del_lotto}}</td>
+	      </tr>
+	      <tr>
+		<td style="border-color: black !important">Indirizzo</td>
+		<td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span ng-bind-template="{{p.Indirizzo}} {{p.N_civico}} {{p.Comune}} {{p.CAP}} {{p.Provincia}}"></span>
+		</td>
+		<td style="border-color: black !important">{{up.perizia.Indirizzo}} {{up.perizia.N_civico}} {{up.perizia.Comune}} {{up.perizia.CAP}} {{up.perizia.Provincia}}
+	      </tr>
+	      <tr>
+		<td style="border-color: black !important">Superficie Principale</td>
+		<td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span ng-bind-template="{{p.SUPERFICIE_COMMERCIALE_MQ}}"></span>
+		</td>
+		<td style="border-color: black !important">{{up.perizia.SUPERFICIE_COMMERCIALE_MQ}} 
+	      </tr>
+	      <tr>
+		<td style="border-color: black !important">Sup. Sec. Balcone (mq)</td>
+		<td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span ng-bind-template="{{p.balcone}}"}}></span>
+		</td>
+		<td style="border-color: black !important">{{up.perizia.balcone}}
+	      </tr>
+	      <tr>
+		<td style="border-color: black !important">Sup. Sec. Cantina (mq)</td>
+		<td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span ng-bind-template="{{p.cantina}}"}}></span>
+		</td>
+		<td style="border-color: black !important">{{up.perizia.cantina}}
+	      </tr>
+	      <tr>
+		<td style="border-color: black !important">Sup. Sec. Giardino (mq)</td>
+		<td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span ng-bind-template="{{p.giardino}}"}}></span>
+		</td>
+		<td style="border-color: black !important">{{up.perizia.giardino}}
+	      </tr>
+	      <tr>
+		<td style="border-color: black !important">Sup. Sec. Portico (mq)</td>
+		<td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+		  <span ng-bind-template="{{p.portico}}"}}></span>
+		</td>
+		<td style="border-color: black !important">{{up.perizia.portico}}
+	      </tr>
+		</tbody>
+	    </table>
+	    <a ng-click="up.stampaPerizie()" class="btn btn-default">Stampa tabella</a>
+	    </div>
+	</div>
+    </div>
+</form>
+<hr><br/><br/> 
+<div ng-controller="logoutController">
+    <a ng-click='logout()' class="btn btn-default">Logout</a>
+</div>   
+      
+
