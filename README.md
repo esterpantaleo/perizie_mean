@@ -15,6 +15,6 @@ curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -
 ~~~~
 
 ##INSPECT DATABASE
-`mongo`
-`use perizie_mean`
-`db.collection.find()`
+* `mongo`
+* `use perizie_mean`
+* `db.collection.find()`
