@@ -120,7 +120,7 @@ Perizia
     .exec(function(err, games) {
 	if (err) return done(err);
 
-	console.log('found %d games with name %s, %s', games.length, games[0].Categoria, games[0].SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE);
+	//console.log('found %d games with name %s', games.length, games[0].SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE);
     });
 
 function done(err) {
