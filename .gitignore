@@ -1,6 +1,9 @@
 *~
 bower_components/
 node_modules/
-uploads/
+uploads/*
+!uploads/README.txt
 LICENSE
 README.sh
+documentation/
+.DS_Store
