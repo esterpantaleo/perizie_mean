@@ -1,8 +1,8 @@
 *~
 bower_components/
 node_modules/
-uploads/*
-!uploads/README.txt
+uploads/*.pdf
+uploads/*.pdf.txt
 LICENSE
 README.sh
 documentation/
