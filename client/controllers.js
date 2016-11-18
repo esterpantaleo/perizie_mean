@@ -173,9 +173,9 @@ angular.module('perizieApp').controller('uploadController', ['$scope', '$sce', '
 	    url: '/user/upload', //webAPI exposed to upload the file
 	    data: {file: file} //pass file as data, should be user ng-model
 	}).then(function (resp) { //upload function returns a promise
-	    if(resp.data.error_code != 0){
+	    if (resp.data.error_code != 0){
 		$window.alert('Errore durante il caricamento del file.');
-	    }
+	    } 
 	}, function (resp) { //catch error
 	    console.log('Error status: ' + resp.status);
 	    $window.alert('Error status: ' + resp.status);
@@ -183,7 +183,6 @@ angular.module('perizieApp').controller('uploadController', ['$scope', '$sce', '
 	    console.log(evt);
 	    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
 	    console.log('percentuale: ' + progressPercentage + '% ' + evt.config.data.file.name);
-	    vm.progress = 'Il file ' + evt.config.data.file.name + ' e\' stato salvato nel database';// capture upload progress
 	});
     };
 
@@ -236,8 +235,8 @@ angular.module('perizieApp').controller('uploadController', ['$scope', '$sce', '
     vm.creaTabella = function(){
 	vm.tabella = true;
     }
-    vm.stampaPerizie = function(){
-	
+
+    vm.stampaPerizie = function(){	
 	vm.printIt();
     }
 
@@ -247,9 +246,6 @@ angular.module('perizieApp').controller('uploadController', ['$scope', '$sce', '
 	myWindow.document.write(table);
 	myWindow.print();
     };
-
-
-
     
 }]);
 

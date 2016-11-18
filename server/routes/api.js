@@ -1,76 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var passport = require('passport');
-var multer = require('multer');
-var path = require('path');
-
-var User = require('../models/user.js');
-var Perizia = require('../models/perizia.js');
-
-
-router.post('/register', function(req, res) {
-  User.register(new User({ username: req.body.username }),
-    req.body.password, function(err, account) {
-    if (err) {
-      return res.status(500).json({
-        err: err
-      });
-    }
-    passport.authenticate('local')(req, res, function () {
-      return res.status(200).json({
-        status: 'Registration successful!'
-      });
-    });
-  });
-});
-
-router.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).json({
-        err: info
-      });
-    }
-    req.logIn(user, function(err) {
-      if (err) {
-        return res.status(500).json({
-          err: 'Could not log in user'
-        });
-      }
-      res.status(200).json({
-        status: 'Login successful!'
-      });
-    });
-  })(req, res, next);
-});
-
-router.get('/logout', function(req, res) {
-  req.logout();
-  res.status(200).json({
-    status: 'Bye!'
-  });
-});
-
-router.get('/status', function(req, res) {
-  if (!req.isAuthenticated()) {
-    return res.status(200).json({
-      status: false
-    });
-  }
-  res.status(200).json({
-    status: true
-  });
-});
-
 var Perizia = require('../models/perizia');
 var fs = require('fs');
 var PDFParser = require('pdf2json');
 
 var uploadDestination = 'uploads';
-var SPACE = "\u00a0"
+var SPACE = "\u00a0";
 
 const destination = function (req, file, cb) {
     cb(null, uploadDestination)
@@ -90,8 +25,7 @@ var upload = multer({ //multer settings
     storage: storage
 }).single('file');
 
-var ubicazioneLines = [
-	    {text:"Comune", jsonId:"Comune", skip:1},
+var ubicazioneLines = [{text:"Comune", jsonId:"Comune", skip:1},
 	    {text:"Provincia", jsonId:"Provincia", skip:1},
 	    {text:"CAP", jsonId:"CAP", skip:1},
 	    {text:"Indirizzo", jsonId:"Indirizzo", skip:1},
@@ -100,7 +34,8 @@ var ubicazioneLines = [
 	    {text:"Scala", jsonId:"Scala", skip:1},
 	    {text:"Piano", jsonId:"Piano", skip:1}
 	];
-	var relevantLines = [
+	
+var relevantLines = [
 	    {text:"Codice" + SPACE + "CRIF", jsonId:"CRIF", skip:1},
 	    {text:"Data" + SPACE + "Evasione" + SPACE + "Perizia", jsonId:"Data_Evasione_Perizia", skip:1},
 	    {text:"Descrizione" + SPACE + "unità" + SPACE + "di" + SPACE + "stima", jsonId:"Descrizione_unita_di_stima", skip:1},
@@ -117,7 +52,8 @@ var ubicazioneLines = [
 	    {text:"RC", jsonId:"RC", skip:7},
 	    {text:"Anno" + SPACE + "di" + SPACE + "costruzione", jsonId:"Anno_di_costruzione", skip:1}
 	];
-	var superficiLines = [
+	
+var superficiLines = [
 	    {text:"Descrizione", jsonId:"Descrizione", skip:1},
 	    {text:"Misura_(mq)", jsonId:"Misura_mq", skip:1},
 	    {text:"Rapporto_mercantile", jsonId:"Rapporto_mercantile", skip:1},
@@ -127,12 +63,13 @@ var ubicazioneLines = [
 
 var parseJsonDataArray = function(arr){
     
-    str = '';
+    var str = '';
     var	jsonString = '';
     for (var i = 0; i < arr.length; i ++) {
 	for (var j = 0; j < arr[i].Texts.length; j ++) {
 	    str = decodeURIComponent(arr[i].Texts[j].R[0].T);
 	    if (str.lastIndexOf("COLLEGATE", 0) === 0){
+                
 		jsonString = jsonString + "SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE:\n[";
 		j = j + 4;
 		for (var h = 1; h < 20; h ++){
@@ -144,6 +81,7 @@ var parseJsonDataArray = function(arr){
 			    j = j + 1;
 			    str = decodeURIComponent(arr[i].Texts[j].R[0].T);
 			    jsonString = jsonString + superficiLines[w].text + ":" + str + ",\n";
+			    superficiLines[w].value = str;
 			}
 			jsonString = jsonString + "},\n";
 		    } else {
@@ -162,6 +100,7 @@ var parseJsonDataArray = function(arr){
 			    j = j + 1;
 			    str = decodeURIComponent(arr[i].Texts[j].R[0].T);
 			    jsonString = jsonString + ubicazioneLines[w].text + ":" + str + "\n";
+			    ubicazioneLines[w].value = str;
 			}
 		    }
 		}
@@ -169,12 +108,30 @@ var parseJsonDataArray = function(arr){
 		for (var w = 0; w < relevantLines.length; w ++){
 		    if (str.lastIndexOf(relevantLines[w].text, 0) === 0){
 			j = j + relevantLines[w].skip;
-			jsonString = jsonString + relevantLines[w].jsonId+":" + decodeURIComponent(arr[i].Texts[j].R[0].T) + "\n";
+			jsonString = jsonString + relevantLines[w].jsonId + ":" + decodeURIComponent(arr[i].Texts[j].R[0].T) + "\n";
+			relevantLines[w].value =  decodeURIComponent(arr[i].Texts[j].R[0].T);
 			j = j - relevantLines[w].skip;
-		    }
+		    } 
 		}
 	    }
 	}
+    }
+    ///////////////////
+    var inputPerizia = new Perizia({
+        CRIF: relevantLines[0].value,
+	Data_Evasione_Perizia: relevantLines[1].value
+    });
+    inputPerizia.save();
+
+    jsonString = jsonString + "\n\n\n\n";
+    for (var w = 0; w < superficiLines.length; w ++){
+	    jsonString += "sup " + w + " = " + superficiLines[w].jsonId + " " + superficiLines[w].value + ",";
+	}
+	for (var w = 0; w < ubicazioneLines.length; w ++){
+	    jsonString += "ubi " + w + " = " + ubicazioneLines[w].jsonId + " " + ubicazioneLines[w].value + ",";
+	}
+    for (var w = 0; w < relevantLines.length; w ++){
+        jsonString += "rel" + w + " = " + relevantLines[w].jsonId + " " + relevantLines[w].value + ",";
     }
     return jsonString;
 }

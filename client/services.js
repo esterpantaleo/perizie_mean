@@ -39,7 +39,6 @@ angular.module('perizieApp').factory('AuthService',
     }
 
     function login(username, password) {
-
       // create a new instance of deferred
       var deferred = $q.defer();
 
@@ -68,7 +67,6 @@ angular.module('perizieApp').factory('AuthService',
     }
 
     function logout() {
-
       // create a new instance of deferred
       var deferred = $q.defer();
 
@@ -91,7 +89,6 @@ angular.module('perizieApp').factory('AuthService',
     }
 
     function register(username, password) {
-
       // create a new instance of deferred
       var deferred = $q.defer();
 

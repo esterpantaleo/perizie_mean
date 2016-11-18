@@ -17,10 +17,11 @@ var Perizia = require('./models/perizia.js');
 var app = express();
 
 // require routes
-var routes = require('./routes/api.js');
+var routes = require('./routes/authenticate.js');
 
 // mongoose
-mongoose.connect('mongodb://localhost/perizie_mean', function(err) {
+var database = require('./config/database.js');
+mongoose.connect(database.url, function(err) {
     // if we failed to connect, abort
     if (err) throw err;
 
@@ -35,8 +36,6 @@ app.use(function(req, res, next) { //allow cross origin requests
     next();
 });
 
-/** Serving from the same express Server
-    No cors required */
 app.use(express.static('../client'));
 app.use(logger('dev'));
 app.use(bodyParser.json());  
@@ -89,46 +88,43 @@ var server = app.listen(app.get('port'), function() {
 function createData(){
     Perizia.create(
 	{
-    CRIF: "000534567.05423",
-    Data: new Date(2016, 5, 29),
-    Indirizzo: "p.zza Nanna",
-    N_civico: 88,
-    Piano:2,
-    Particella:1217,
-    Tipologia_edilizia:"appartamento",
-    Categoria:"A/3",
-    Consistenza:6.5,
-    RC:386.05,
-    Foglio:107,
-    SUPERFICIE_COMMERCIALE_MQ:96.35,
-    Anno_di_costruzione:1968,
-    Impianto_elettrico_Vetusta_anni:15,
-    Impianto_idraulico_Vetusta_anni:15,
-    Provincia: "BA",
-    Comune: "Modugno",
-    CAP: "70131",
-    SUPERFICIE_COMMERCIALE_MQ: "200",
-    Valore_di_mercato_del_lotto: "700000",
-    balcone:"6",
-    cantina:"22",
+            CRIF: "000534567.05423",
+            Data: new Date(2016, 5, 29),
+            Indirizzo: "p.zza Nanna",
+            N_civico: 88,
+            Piano:2,
+            Particella:1217,
+            Tipologia_edilizia:"appartamento",
+            Categoria:"A/3",
+            Consistenza:6.5,
+            RC:386.05,
+            Foglio:107,
+            SUPERFICIE_COMMERCIALE_MQ:96.35,
+            Anno_di_costruzione:1968,
+            Impianto_elettrico_Vetusta_anni:15,
+            Impianto_idraulico_Vetusta_anni:15,
+            Provincia: "BA",
+            Comune: "Modugno",
+            CAP: "70131",
+            SUPERFICIE_COMMERCIALE_MQ: "200",
+            Valore_di_mercato_del_lotto: "700000",
+            balcone:"6",
+            cantina:"22",
 	    portico:"3"
 	}
-    )};
+    )
+};
 
-Perizia
-    .find({})
+Perizia.find({})
     .exec(function(err, games) {
 	if (err) return done(err);
-
-	//console.log('found %d games with name %s', games.length, games[0].SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE);
+            //console.log('found %d games with name %s', games.length, games[0].SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE);
     });
 
 function done(err) {
     if (err) console.error(err);
     Perizia.remove(function() {
-	
-	    mongoose.disconnect();
-	
+        mongoose.disconnect();
     });
 }
 
