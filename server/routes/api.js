@@ -1,9 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var Perizia = require('../models/perizia');
+var multer = require('multer');
+var path = require('path');
 var fs = require('fs');
 var PDFParser = require('pdf2json');
 
+var Perizia = require('../models/perizia');
 var uploadDestination = 'uploads';
 var SPACE = "\u00a0";
 
@@ -116,12 +118,13 @@ var parseJsonDataArray = function(arr){
 	    }
 	}
     }
-    ///////////////////
-    var inputPerizia = new Perizia({
-        CRIF: relevantLines[0].value,
-	Data_Evasione_Perizia: relevantLines[1].value
-    });
-    inputPerizia.save();
+
+    Perizia.create({CRIF: relevantLines[0].value, Data_Evasione_Perizia: relevantLines[1].value}, 
+        function(err, per){
+            if (err) res.send(err);
+	});
+
+    
 
     jsonString = jsonString + "\n\n\n\n";
     for (var w = 0; w < superficiLines.length; w ++){
@@ -171,7 +174,7 @@ router.post('/upload', function(req, res){
     })
 });
 
-router.get('/perizie/:CRIF', function (req, res) {
+router.get('/upload/:CRIF', function (req, res) {
 	Perizia.findOne({ CRIF: req.params.CRIF },{}, function (err, per) {
 	    if (err || !per) {
 		res.render('error', {});

@@ -17,7 +17,8 @@ var Perizia = require('./models/perizia.js');
 var app = express();
 
 // require routes
-var routes = require('./routes/authenticate.js');
+var authenticate = require('./routes/authenticate.js');
+var api = require('./routes/api.js');
 
 // mongoose
 var database = require('./config/database.js');
@@ -56,7 +57,8 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 // routes
-app.use('/user/', routes);
+app.use('/user/', authenticate);
+app.use('/api/', api);
 
 app.get('/', function(req, res) {
     res.sendFile(path.join('client', 'index.html'));

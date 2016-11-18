@@ -43,11 +43,6 @@ perizieApp.config(function ($routeProvider) {
 	    controller: 'ricercaController',
 	    access: {restricted: true}
 	})
-	.when('/upload', {
-	    templateUrl: 'partials/upload.html',
-	    controller: 'homeController',
-	    access: {restricted: true}
-	})
 	.otherwise({
 	    redirectTo: '/'
 	});

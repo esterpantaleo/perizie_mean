@@ -170,7 +170,7 @@ angular.module('perizieApp').controller('uploadController', ['$scope', '$sce', '
         
     vm.upload = function(file){
 	Upload.upload({
-	    url: '/user/upload', //webAPI exposed to upload the file
+	    url: '/api/upload', //webAPI exposed to upload the file
 	    data: {file: file} //pass file as data, should be user ng-model
 	}).then(function (resp) { //upload function returns a promise
 	    if (resp.data.error_code != 0){
