@@ -9,12 +9,15 @@ var path = require('path');
 var passport = require('passport');
 var localStrategy = require('passport-local' ).Strategy;
 var mongoose = require('mongoose');
+//var flash = require('connect-flash');
 
 var User = require('./models/user.js');
 var Perizia = require('./models/perizia.js');
 
 // create instance of express 
 var app = express();
+
+//app.use(flash());
 
 // require routes
 var authenticate = require('./routes/authenticate.js');
@@ -27,7 +30,7 @@ mongoose.connect(database.url, function(err) {
     if (err) throw err;
 
     // we connected ok
-    createData();
+    //createData();
 });
 
 app.use(function(req, res, next) { //allow cross origin requests
@@ -88,10 +91,10 @@ var server = app.listen(app.get('port'), function() {
 });
 
 function createData(){
-    Perizia.create(
-	{
-            CRIF: "000534567.05423",
-            Data: new Date(2016, 5, 29),
+    var myPerizia = new Perizia({ 
+	    CRIF: "123456789.4567890", 
+	    Valore_di_mercato_del_lotto: 10000,
+	    Data_Evasione_Perizia: new Date(2016, 5, 29),
             Indirizzo: "p.zza Nanna",
             N_civico: 88,
             Piano:2,
@@ -103,18 +106,25 @@ function createData(){
             Foglio:107,
             SUPERFICIE_COMMERCIALE_MQ:96.35,
             Anno_di_costruzione:1968,
-            Impianto_elettrico_Vetusta_anni:15,
-            Impianto_idraulico_Vetusta_anni:15,
+            Impianto_elettrico_anni:15,
+            Impianto_idraulico_anni:15,
             Provincia: "BA",
             Comune: "Modugno",
             CAP: "70131",
-            SUPERFICIE_COMMERCIALE_MQ: "200",
-            Valore_di_mercato_del_lotto: "700000",
-            balcone:"6",
-            cantina:"22",
-	    portico:"3"
-	}
-    )
+            SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE: {
+		Descrizione: "balcone",
+                Misura_mq: "6"
+		//cantina:"22",
+		//portico:"3"
+	    }
+	});
+    myPerizia.save(function (err) {
+	    if (err) {
+		console.log(err);
+	    } else {
+		console.log('La perizia CRIF ' + "123456789.4567890" + ' è stata salvata');
+	    }
+	});
 };
 
 Perizia.find({})

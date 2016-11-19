@@ -114,3 +114,12 @@ angular.module('perizieApp').factory('AuthService',
     }
 
   }]);
+
+
+angular.module('perizieApp')
+    .factory('Perizie', []) ["$http", function($http) {
+	return { 
+	    get: function(){ return $http.get('/api/upload');}
+	    //    create: function(datiPerizia){ return $http.post('/api/upload', datiPerizia);}
+	} 
+    }];

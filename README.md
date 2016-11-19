@@ -17,3 +17,9 @@ curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -
 * `mongo`
 * `use perizie_mean`
 * `db.collection.find()`
+
+###TODO
+* print error when trying to upload a file to the collection that already exists (file server/api.js) (maybe use flash error or validate in model)
+* print error when trying to upload a file with incorrect address -> undefined longitude and latitude -> insert GPS coordinates
+
+
