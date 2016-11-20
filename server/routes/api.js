@@ -203,6 +203,7 @@ router.post('/upload', function(req, res){
 				});
 			    } 
 		});
+	    jsonMongo.Nome_File = req.file.filename;
 	    console.log(jsonMongo);
             var uploadedPerizia = new Perizia(jsonMongo);
 	    uploadedPerizia.save(function(errm) {

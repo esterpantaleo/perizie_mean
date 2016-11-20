@@ -1,0 +1,89 @@
+<form ng-controller="georicercaController" name="form">
+  <h1>Ricerca una Perizia</h1>
+  
+  <hr>
+  <div ng-show="form.input.$error && submitted" class="alert alert-danger">{{errorMessage}}</div>
+  Cerca perizie successive alla data <input type="date" ng-model="DATA_MIN" placeholder="dd/MM/yyyy" required> nel raggio di <input type="number" ng-model="DISTANZA" placeholder={{DISTANZA}}> Km da 
+  <input type="text" name="input" ng-model="indirizzo" placeholder="Corso Cavour 167, 70121, Bari" size="40" required>
+  <br/><br/>
+  
+  <a type="submit" class="btn btn-default" ng-click="submit()">
+    Cerca
+  </a>
+
+  <hr> 
+
+  <div ng-show="visPerizia"> 
+    <div ng-repeat="p in perizie">  
+      <input type="checkbox" ng-model="p.selected">
+      <span ng-bind-template="{{p.Data_Evasione_Perizia | date: 'dd/MM/yyyy'}} - {{p.Tipologia_edilizia}} - {{p.SUPERFICIE_COMMERCIALE_MQ}}" style="outline:1px solid blue;"></span>
+      <div style="text-indent: 3em;" ng-bind-template="{{p.Valore_di_mercato_del_lotto}}&#8364;"/>
+      <div style="text-indent: 3em;" ng-bind-template="Provincia: {{p.Provincia}}&emsp;Comune: {{p.Comune}}&emsp;CAP: {{p.CAP}}&emsp;Indirizzo: {{p.Indirizzo}}&emsp;N.civico: {{p.N_civico}}"/>
+    </div>
+  
+    <hr>
+    
+    <a ng-click="table()" class="btn btn-default">
+      Crea tabella
+    </a>
+
+    <hr>
+    <div ng-show="printed" id="tabella">
+      <table class="table table-bordered table-condensed" style="width:100%; border-color: black !important">
+	<thead>
+          <tr>
+            <th style="border-color: black !important">prezzo e caratteristica</th>
+            <th style="border-color: black !important" ng-repeat="p in perizie" ng-if="p.selected">
+              <span>immobile di confronto {{$index + 1}}</span>
+          </tr>
+	</thead>
+	<tbody>
+          <tr>
+            <td style="border-color: black !important">Prezzo Di Mercato (Euro)</td>
+            <td style="border-color: black !important" ng-repeat="p in perizie" ng-if="p.selected">
+              <span ng-bind-template="{{p.Valore_di_mercato_del_lotto}}"></span>
+          </tr>
+          <tr>
+            <td style="border-color: black !important">Indirizzo</td>
+            <td style="border-color: black !important" ng-repeat="p in perizie" ng-if="p.selected">
+              <span ng-bind-template="{{p.Indirizzo}} {{p.N_civico}} {{p.Comune}} {{p.CAP}} {{p.Provincia}}"></span>
+          </tr>
+          <tr>
+            <td style="border-color: black !important">Superficie Principale</td>
+            <td style="border-color: black !important" ng-repeat="p in perizie" ng-if="p.selected">
+              <span ng-bind-template="{{p.SUPERFICIE_COMMERCIALE_MQ}}"></span>
+          </tr>
+          <tr>
+            <td style="border-color: black !important">Sup. Sec. Balcone (mq)</td>
+            <td style="border-color: black !important" ng-repeat="p in perizie" ng-if="p.selected">
+              <span ng-bind-template="{{p.balcone}}"}}></span>
+          </tr>
+          <tr>
+            <td style="border-color: black !important">Sup. Sec. Cantina (mq)</td>
+            <td style="border-color: black !important" ng-repeat="p in perizie" ng-if="p.selected">
+              <span ng-bind-template="{{p.cantina}}"}}></span>
+          </tr>
+          <tr>
+            <td style="border-color: black !important">Sup. Sec. Giardino (mq)</td>
+            <td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+              <span ng-bind-template="{{p.giardino}}"}}></span>
+          </tr>
+          <tr>
+            <td style="border-color: black !important">Sup. Sec. Portico (mq)</td>
+            <td style="border-color: black !important" ng-repeat="p in up.perizie" ng-if="p.selected">
+              <span ng-bind-template="{{p.portico}}"}}></span>
+          </tr>
+	</tbody>
+      </table>
+    </div>
+    <hr ng-show="printed">
+    <a ng-show="printed" ng-click="print()" class="btn btn-default">
+      Stampa tabella
+    </a>
+    <hr ng-show="printed">       
+  </div>
+</form>
+
+<div ng-controller="logoutController">
+  <a ng-click='logout()' class="btn btn-default">Logout</a>
+</div>

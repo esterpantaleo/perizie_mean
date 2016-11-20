@@ -1,11 +1,17 @@
 <h1>Benvenuto all'interno del software Perizie</h1>
 <hr>
 <div ng-controller="homeController">
-  Ricerca una vecchia perizia oppure carica una nuova perizia<br/><br/>
-  <a ng-click='go("/ricerca")' class="btn btn-default">Ricerca</a>
+  Ricerca una vecchia perizia utilizzando il CRIF oppure un indirizzo
+  <br/><br/>
+  <a ng-click='go("/ricerca")' class="btn btn-default">Ricerca CRIF</a>
+  <a ng-click='go("/georicerca")' class="btn btn-default">Ricerca Geografica</a>
+  <hr> 
+  Carica una nuova perizia
+  <br/><br/> 
   <a ng-click='go("/upload")' class="btn btn-default">Carica</a>
 </div>
 <hr>
+
 <div ng-controller="logoutController">
   <a ng-click='logout()' class="btn btn-default">Logout</a>
 </div>

@@ -1,44 +1,57 @@
-<h1>Ricerca Perizie</h1>
-<form  ng-controller="ricercaController as ctrl" name="ctrl.ricerca_form">  
+<form ng-controller="ricercaController" name="form">  
+  <h1>Ricerca una Perizia</h1>
 
-  <p>Inserisci il nome del file che cerchi nel database: <input type="text" name="input" ng.model="ctrl.filename" ng-pattern="ctrl.parola" required ng-trim="false"/></p>
-  <div role="alert">
-    <span class="error" ng-show="ctrl.ricerca_form.input.$error.required">
-      E' necessario inserire il nome di un file!</span>
-    <span class="error" ng-show="ctrl.ricerca_form.input.$error.pattern">
-      E' richiesto un file .pdf!</span>
-  </div>
-  <a type="submit" class="btn btn-default" ng-click="ctrl.visualizzaPerizia()">Visualizza</a>
   <hr>
-  <div ng-show="ctrl.visPerizia">   
-  <h1>Dati perizia</h1>
-<table class="table"><tr>
-    <td style="border-top: none !important">Provincia:</td><td style="border-top: none !important">{{ctrl.perizia.Provincia}}</td><td style="border-top: none !important">Comune:</td><td style="border-top: none !important">{{ctrl.perizia.Comune}}</td><td style="border-top: none !important">CAP:</td><td style="border-top: none !important">{{ctrl.perizia.CAP}}</td><td style="border-top: none !important">Indirizzo:</td><td style="border-top: none !important">{{ctrl.perizia.Indirizzo}}</td><td style="border-top: none !important">N.civico:</td><td style="border-top: none !important">{{ctrl.perizia.N_civico}}</td>
-  </tr>
-  <br/><br/>
-  <table class="table table-bordered table-sm table-condensed">
-    <tr>
-      <td>Data</td><td>{{ctrl.perizia.Data | date: "dd/MM/yyyy"}}</td>
-    </tr><tr>
-      <td>Tipologia edilizia</td><td>{{ctrl.perizia.Tipologia_edilizia}}</td>
-    </tr><tr>
-      <td> Superficie Commerciale (mq)</td><td>{{ctrl.perizia.SUPERFICIE_COMMERCIALE_MQ}}</td>
-      </tr><tr>
-      <td>Valore di mercato</td><td>{{ctrl.perizia.Valore_di_mercato_del_lotto}}</td>
-      </tr><tr>
-  <td>Anno di costruzione </td><td>{{ctrl.perizia.Anno_di_costruzione}}</td>
-</tr><tr>
-      <td>Impianto elettrico - Vetusta' Anni</td><td> {{ctrl.perizia.Impianto_elettrico_Vetusta_anni}}</td>
-      </tr><tr>
-      <td>Inpianto Idraulico - Vetusta' Anni</td><td>{{ctrl.perizia.Impianto_idraulico_Vetusta_anni}}</td>
-      </tr><tr>
-      <td>Sup. Sec. Cantina</td><td>{{ctrl.perizia.cantina}}</td>
-      </tr><tr>
-      <td>Sup. Sec. Balcone</td><td>{{ctrl.perizia.balcone}}</td>
-      </tr><tr>
-      <td>Sup. Sec. Portico</td><td>{{ctrl.perizia.portico}}</td>
-</tr>
-</table>
-  <div/>   
-</form>
+  <div ng-show="form.input.$error && submitted" class="alert alert-danger">{{errorMessage}}</div> 
+  Inserisci il nome del file che cerchi nel database: 
+  <input type="text" name="input" ng-model="filePerizia" ng-pattern="/^[0-9]{5,}.[0-9]{12,}_[0-9]{4,}_[0-9]{3,}.RiepilogoPerizia.pdf$/" ng-trim="false" required/>
+  <br/><br/>       
+
+  <a type="submit" class="btn btn-default" ng-click="submit()">
+    Visualizza
+  </a>
   
+  <hr>
+  
+  <div ng-show="visPerizia">   
+    <h1>Dati perizia</h1>
+    <table class="table">
+      <tr>
+	<td style="border-top: none !important">Provincia:</td><td style="border-top: none !important">{{perizia.data.Provincia}}</td><td style="border-top: none !important">Comune:</td><td style="border-top: none !important">{{perizia.data.Comune}}</td><td style="border-top: none !important">CAP:</td><td style="border-top: none !important">{{perizia.data.CAP}}</td><td style="border-top: none !important">Indirizzo:</td><td style="border-top: none !important">{{perizia.data.Indirizzo}}</td><td style="border-top: none !important">N.civico:</td><td style="border-top: none !important">{{perizia.N_civico}}</td>
+      </tr>
+      
+      <br/><br/>
+      
+      <table class="table table-bordered table-sm table-condensed">
+	<tr>
+	  <td>Data</td><td>{{perizia.Data_Evasione_Perizia | date: "dd/MM/yyyy"}}</td>
+	</tr>
+	<tr>
+	  <td>Tipologia edilizia</td><td>{{perizia.Tipologia_edilizia}}</td>
+	</tr>
+	<tr>
+	  <td> Superficie Commerciale (mq)</td><td>{{perizia.SUPERFICIE_COMMERCIALE_MQ}}</td>
+	</tr>
+	<tr>
+	  <td>Valore di mercato</td><td>{{perizia.Valore_di_mercato_del_lotto}}</td>
+	</tr>
+	<tr>
+	  <td>Anno di costruzione </td><td>{{perizia.Anno_di_costruzione}}</td>
+	</tr>
+	<tr>
+	  <td>Impianto elettrico - Vetustà Anni</td><td> {{perizia.Impianto_elettrico_anni}}</td>
+	</tr>
+	<tr>
+	  <td>Impianto Idraulico - Vetustà Anni</td><td>{{perizia.Impianto_idraulico_anni}}</td>
+	</tr>
+	<tr ng-repeat="Superficie_Secondaria in perizia.data.SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE">
+	  <td>Sup. Sec. {{Superficie_Secondaria.Descrizione}}</td><td>{{Superficie_Secondaria.Misura_mq}}</td>
+	</tr>
+      </table>
+  <hr>
+  </div>
+</form>
+
+<div ng-controller="logoutController">
+  <a ng-click='logout()' class="btn btn-default">Logout</a>
+</div>

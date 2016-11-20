@@ -1,7 +1,6 @@
 angular.module('perizieApp').factory('AuthService',
   ['$q', '$timeout', '$http',
   function ($q, $timeout, $http) {
-
     // create user variable
     var user = null;
 
@@ -117,9 +116,18 @@ angular.module('perizieApp').factory('AuthService',
 
 
 angular.module('perizieApp')
-    .factory('Perizie', []) ["$http", function($http) {
-	return { 
-	    get: function(){ return $http.get('/api/upload');}
-	    //    create: function(datiPerizia){ return $http.post('/api/upload', datiPerizia);}
+    .factory('PerizieService', []) ["$http", function($http) {
+	return { /*
+	    getPerizia: getPerizia,
+	    findPerizie: findPerizie
 	} 
+
+        function getPerizia(id){
+	    return $http.get('/api/' + id);
+	}
+
+	function findPerizie(indirizzo, maxRaggio, minData){
+	    return $http.get('/api/', indirizzo, maxRaggio, minData);
+	    }*/
+	}
     }];
