@@ -40,7 +40,10 @@ var Perizia = new Schema({
 	Anno_di_costruzione: { type: Number, min: 0 },
 	Impianto_elettrico_anni: { type: Number, min: 0 },
 	Impianto_idraulico_anni: { type: Number, min: 0 },
-	Nome_File: {type: String, validate: /^\s*\d{5,5}\.\d{12,12}_\d{4,4}_\d{3,3}\.RiepilogoPerizia\.pdf\s*$/ }
+	Nome_File: {type: String, validate: /^\s*\d{5,5}\.\d{12,12}_\d{4,4}_\d{3,3}\.RiepilogoPerizia\.pdf\s*$/ },
+	loc: { type: [Number], // [<longitude>, <latitude>]
+	       index: '2d' // create the geospatial index
+	}
     });
 
 module.exports =  mongoose.model('perizie', Perizia);

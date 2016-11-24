@@ -18,7 +18,7 @@ angular.module('perizieApp')
 			    // handle error
 			    .catch(function () {
 				    $scope.error = true;
-				    $scope.errorMessage = "Invalid username and/or password";
+				    $scope.errorMessage = "Nome utente e/o password invalidi";
 				    $scope.disabled = false;
 				    $scope.loginForm = {};
 				});
@@ -57,7 +57,7 @@ angular.module('perizieApp')
 			    // handle error
 			    .catch(function () {
 				    $scope.error = true;
-				    $scope.errorMessage = "Something went wrong!";
+				    $scope.errorMessage = "Errore!";
 				    $scope.disabled = false;
 				    $scope.registerForm = {};
 				});
@@ -73,92 +73,49 @@ angular.module('perizieApp')
 			};
 		    }]);
 angular.module('perizieApp')
-    .controller('georicercaController', ['$scope', '$window',    
-					 function($scope, $window){  
+    .controller('georicercaController', ['$scope', '$window', '$http',    
+					 function($scope, $window, $http){  
 			$scope.DATA_MIN = new Date(2010, 0, 1);
 			$scope.DISTANZA = 5;
-			$scope.perizie =[{
-				Data_Evasione_Perizia: new Date(2015, 3, 11),
-				Indirizzo: "c.so alcide de gasperi",
-				N_civico: 400,
-				Provincia: "BA",
-				Comune: "Bari",
-				CAP: "70131",
-				SUPERFICIE_COMMERCIALE_MQ: "70",
-				Tipologia_edilizia: "Casa indipendente 1 piano.",
-				Valore_di_mercato_del_lotto: "190000",
-				Anno_di_costruzione:1950,
-				Impianto_elettrico_anni:13,
-				Impianto_idraulico_anni:13
-			    },{
-				Data_Evasione_Perizia: new Date(2012, 9, 9),
-				Indirizzo: "p.zza Umberto 830",
-				N_civico: 83,
-				Provincia: "BA",
-				Comune: "Bari",
-				CAP: "70131",
-				SUPERFICIE_COMMERCIALE_MQ: "180",
-				Tipologia_edilizia: "Casa indipendente 2 piani.",
-				Valore_di_mercato_del_lotto:"200000",
-				Impianto_elettrico_anni:2,
-				Impianto_idraulico_anni:2
-                                }];
+			$scope.limite = 10;
+						
 			$scope.submit = function(){
-			    $scope.submitted = true;
 			    if ($scope.form.input.$error.required){
 				$scope.errorMessage = 'E\' necessario inserire un indirizzo!';
 				return;
 			    }
 			    $scope.form.input.$error = false;
+			    $scope.submitted = true;
+			    console.log('distanza=' + $scope.DISTANZA); 
+			    $http.get('/api/distanza/' + $scope.DISTANZA + '/limite/' + $scope.limite + '/DATA_MIN/' + $scope.DATA_MIN + '/indirizzo/' + $scope.indirizzo)
+			    .success(function (data, status) { 
+				    $scope.perizie = data;
+				    console.log($scope.perizie);  
+				})
+			    .error(function (data) { 
+				    console.log("Errore nel trovare le perizie"); 
+				});
 			    $scope.visPerizia = true;
 			}
+
 			$scope.table = function(){
 			    $scope.printed = true;
 			}
-			$scope.print = function(){
-			    printIt();
-			}
-			printIt = function(){ 
-			    var table = document.getElementById('tabella').innerHTML;   
-			    var myWindow = $window.open('', '', 'width=800, height=600');   
-			    myWindow.document.write(table);   
-			    myWindow.print();  
-			};
 
+			$scope.print = function(){
+			    var table = document.getElementById('tabella').innerHTML;   
+			    var myWindow = $window.open('', '', 'width=800, height=600'); 
+			    myWindow.document.write(table);  
+			    myWindow.print();       
+			}
 		    }]);
 
 angular.module('perizieApp')
-    .controller('ricercaController', ['$scope', 
-		 function($scope){
-			$scope.perizia = {
-			    CRIF: "000534567.05424",
-			    Data_Evasione_Perizia: new Date(2016, 4, 29),
-			    Indirizzo: "p.zza Umberto",
-			    N_civico: 87,
-			    Piano:2,
-			    Particella:1217,
-			    Categoria:"A/3",
-			    Consistenza:6.5,
-			    RC:386.05,
-			    Foglio:107,
-			    Tipologia_edilizia:"appartamento",
-			    SUPERFICIE_COMMERCIALE_MQ:96.35,
-			    Anno_di_costruzione:1968,
-			    Impianto_elettrico_anni:15,
-			    Impianto_idraulico_anni:15,
-			    Provincia: "BA",
-			    Comune: "Bari",
-			    CAP: "70131",
-			    SUPERFICIE_COMMERCIALE_MQ: "150",
-			    Valore_di_mercato_del_lotto: "200000",
-			    SUPERFICI_SECONDARIE_ANNESSE_E_COLLEGATE: [
-			{Descrizione: "balcone", Misura_mq: "6"},
-			{Descrizione: "cantina", Misura_mq: "22"},
-			{Descrizione: "portico", Misura_mq: "3"}
-								       ]
-			}
+    .controller('ricercaController', ['$scope', '$http',
+				      function($scope, $http){
 			$scope.submit = function(){
 			    $scope.submitted = true;
+			    console.log($scope.filePerizia);
                             if ($scope.form.input.$error.required){
 				$scope.errorMessage = 'E\' necessario inserire il nome di un file!';
 				return;
@@ -168,47 +125,29 @@ angular.module('perizieApp')
 				return;
 			    }
                             $scope.form.input.$error = false;
+			    $http.get('/api/file/' + $scope.filePerizia)
+			    .success(function (data, status) {
+				    console.log("Perizia del file " + $scope.filePerizia + " trovata");
+				    $scope.perizia = data;
+				}) 
+				.error(function (data) {
+					console.log("Errore nel trovare la perizia del file " + $scope.filePerizia.name);
+				    });
                             $scope.visPerizia = true;
 			}
 		    }]);
 							      
 angular.module('perizieApp')
-    .controller('uploadController', ['$scope', 'Upload', '$window', 
-				     function($scope, Upload, $window){
+    .controller('uploadController', ['$scope', '$window', '$http', 'Upload',
+				     function($scope, $window, $http, Upload){
 			$scope.submitted = false;
 			$scope.cercata = false;
 			
-			$scope.perizia = {
-			    CRIF: "000534567.05424",
-			    Data_Evasione_Perizia: new Date(2016, 4, 29),
-			    Indirizzo: "p.zza Umberto",
-			    N_civico: 87,
-			    Piano:2,
-			    Particella:1217,
-			    Tipologia_edilizia:"appartamento",
-			    Categoria:"A/3",
-			    Consistenza:6.5,
-			    RC:386.05,
-			    Foglio:107,
-			    SUPERFICIE_COMMERCIALE_MQ:96.35,
-			    Anno_di_costruzione:1968,
-			    Impianto_elettrico_Vetusta_anni:15,
-			    Impianto_idraulico_Vetusta_anni:15,
-			    Provincia: "BA",
-			    Comune: "Bari",
-			    CAP: "70131",
-			    SUPERFICIE_COMMERCIALE_MQ: "150",
-			    Valore_di_mercato_del_lotto: "200000",
-			    balcone:"6",
-			    cantina:"22",
-			    portico:"3"
-			};
-			
 			$scope.submit = function(){ //function to call on form submit
-			    if ($scope.form.file.$valid && $scope.filePerizia) { //check if form is valid
-				$scope.uploadFile($scope.filePerizia); //call upload function
-				$scope.submitted = true;
+			    if ($scope.form.file.$valid && $scope.filePerizia) { 
+				$scope.uploadFile($scope.filePerizia); //call upload function        
 			    }	
+
 			}
 			
 			$scope.cerca = function(){
@@ -221,23 +160,72 @@ angular.module('perizieApp')
 				    url: '/api/upload', //webAPI exposed to upload the file
 				    data: {file: file} //pass file as data, should be user ng-model
 				}).then(function (resp) { //upload function returns a promise
+                                        $scope.error = false;
 					if (resp.data.error_code != 0){
 					    $window.alert('Errore durante il caricamento del file.');
-					} 
+					} 	
 				    }, function (resp) { //catch error
+					console.log(resp);
 					console.log('Error status: ' + resp.status);
 					$window.alert('Error status: ' + resp.status);
-				    
-				    });
+				    })
+			    $scope.submitted = true; 
 			};
-						
+			
 			$scope.visualizza = function(){
+			    console.log("visualizzo la perizia");
+			    $http.get('/api/file/' + $scope.filePerizia.name)
+			    .success(function (data, status) {
+				    console.log("Perizia del file " + $scope.filePerizia.name + " trovata");
+				    $scope.perizia = data;
+				    if ($scope.perizia.loc == undefined){
+					//visualizza "input form" per longitudine e latitudine
+					$scope.erroreLonLat = true;
+					//non visualizzare "il file e' stato salvato" 
+					$scope.submitted = false;
+					return;
+				    }
+				    $scope.submitted = true;
+				})
+			    .error(function (data) {
+				    console.log("Errore nel trovare la perizia del file " + $scope.filePerizia.name);
+				});
 			   $scope.show = true;
 			}
 			
 			$scope.carica = function(){
 			    $scope.form.file.name = '';
 			    document.getElementById('selectedFile').click();
+			}
+
+			$scope.submitLatLon = function(){
+			    $scope.error = false;
+			    if ($scope.form.input1.$error.required){
+				$scope.error = true;
+				$scope.errorMessage = "Inserire latitudine.";
+				$scope.submitted = false;
+				return;
+			    }
+			    if ($scope.form.input2.$error.required){
+				$scope.error = true;
+				$scope.errorMessage = "Inserire longitudine.";
+				$scope.submitted = false;
+				return;
+			    }
+			    if ($scope.form.input1.$error.min || $scope.form.input1.$error.max){
+				$scope.error = true;
+				$scope.errorMessage = "Il valore inserito per la latitudine non è valido.";
+				$scope.submitted = false;
+				return;
+			    }
+			    if ($scope.form.input2.$error.min || $scope.form.input2.$error.max){
+				$scope.error = true;
+				$scope.errorMessage = "Il valore inserito per la longitudine non è valido"
+				$scope.submitted = false;
+				return;
+			    }
+
+			    $scope.submitted = true;
 			}
 						
 		    }]);

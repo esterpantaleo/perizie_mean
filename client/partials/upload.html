@@ -1,6 +1,7 @@
 <form ng-controller="uploadController" name="form">
     <div>
         <h1>Carica Perizia</h1>
+	<div ng-show="error" class="alert alert-danger">{{errorMessage}}</div>
         <hr>
         Scegli il file della perizia:
         <input type="file" ngf-select ng-model="filePerizia" 
@@ -16,7 +17,7 @@
         <!--<i ng-if="form.file.name.size">Il file {{file.name}} e' stato scelto</i>-->
 
         <p ng-show="cercata">
-	  Il file selezionato e' {{filePerizia.name}}. 
+	  Il file selezionato è {{filePerizia.name}}. 
 	  <br/>
 	  Clicca su Salva per aggiungerlo al database.
 	</p>  
@@ -24,9 +25,23 @@
 	<a ng-show="cercata" type="submit" class="btn btn-default" ng-click="submit()">
 	  Salva
 	</a>
-        
+
+	<div ng-show="erroreLonLat">
+          <p>
+            Impossibile identificare le coordinate gps dell'indirizzo {{perizia.Indirizzo}} {{perizia.N_civico}}, {{perizia.Comune}}, {{perizia.CAP}} {{perizia.Provincia}} con Openstreetmaps. 
+            E' necessario inserire le coordinate gps manualmente. 
+            Per fare ciò utilizzare google maps come mostrato nel <a href="https://www.youtube.com/watch?v=RVVeQFZQbPA">video</a> (su google maps cliccare con il tasto destro del mouse 
+            sulla posizione in cui è collocato l'immobile, poi scegliere il campo "Cosa c'è qui").
+          </p>
+          Longitudine: <input name="input2" type="number" ng-model="perizia.loc[0]" min="36" max="47" required> 
+	  Latitudine: <input name="input1" type="number" ng-model="perizia.loc[1]" min="6" max="20" required>  
+          </br>
+	  <a ng-click="submitLatLon()" type="submitLatLon" class="btn btn-default">
+	    Salva
+	  </a>    
+	</div>
 	<p ng-show="submitted">
-	  Il file selezionato e' stato salvato
+	  Il file selezionato è stato salvato
 	</p>
         
 	<i ng-show="form.file.$error.required" >*campo obbligatorio</i><br>
@@ -35,7 +50,7 @@
 
         <a ng-show="(cercata && submitted)" type="submit" class="btn btn-default" ng-click="visualizza()">
 	  Visualizza
-	</a> 
+	</a>
     </div>
 
     <div ng-show="show">

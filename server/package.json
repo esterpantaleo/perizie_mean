@@ -30,6 +30,7 @@
     "passport-local-mongoose": "^4.0.0",
     "moment": "^2.16.0",
 "node-nominatim2": "0.1.0",
-"util": "0.10.3"
+"util": "0.10.3”,
+“async”: “0.2.10”
   }
 }

@@ -9,8 +9,8 @@ const util = require('util');
 var Nominatim = require('node-nominatim2');
 
 var Perizia = require('../models/perizia');
-var uploadDestination = 'uploads';
-var SPACE = "\u00a0";
+
+//data needed by openstreemaps
 var options = {
     useragent: 'MyApp',
     referer: 'https://github.com/xbgmsharp/node-nominatim2',
@@ -18,6 +18,8 @@ var options = {
 };
 var nominatim = new Nominatim(options);
 
+var uploadDestination = 'uploads';
+var SPACE = "\u00a0";
 const destination = function (req, file, cb) {
     cb(null, uploadDestination)
 };
@@ -154,88 +156,131 @@ var parseJsonPdf = function(arr){
     return jsonString;
 }
 
-router.post('/upload', function(req, res){
-    
-    upload(req, res, function(err){
-	if (err){
-	    res.json({error_code:1, err_desc:err});
-            return;
-	}
-	
-        res.json({error_code:0, err_desc:null});
-	var pdfParser = new PDFParser(this, 1);
-        pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError) );
-        pdfParser.on("pdfParser_dataReady", pdfData => {
-	    var jsonPdf = JSON.parse(JSON.stringify(pdfData, null, '\t')).formImage.Pages;
-	    var jsonString = parseJsonPdf(jsonPdf);	    	    
-	    fs.writeFile(uploadDestination + path.sep + req.file.filename + '.txt', jsonString, function(errf) {
-		if (errf) {
-		    return console.log(errf);
+var salvaPerizia = function (json){    
+    console.log("salvo la perizia");
+    var uploadedPerizia = new Perizia(json);
+    uploadedPerizia.save(function(err) {
+	    if (err) {
+		//console.log(err.code); 
+		if (err.code === 11000){//duplicate key
+		    console.log(err.message);
+		    return;
+		} else {
+		    console.log(err);
 		}
-		jsonPdf = null;
-	    });	    
-            var jsonMongo = JSON.parse(jsonString);
-            var indirizzo = jsonMongo.Indirizzo + " " + jsonMongo.N_civico + ", " + jsonMongo.Comune + ", " + jsonMongo.CAP + " " + jsonMongo.Provincia;
-	    console.log(indirizzo);
-
-            //usa Nominatim per ottenere longitudine e latitudine associateal luogo della perizia
-	    var lat, lon;
-	    //nominatim.search({q: "135 pilkington, avenue birmingham"}, function (err, res, data) {
-	    nominatim.search({q: indirizzo}, function (errn, res, data) { 
-		    if (errn) throw errn;
-		    if (data[0] != undefined){
-			jsonMongo.lat = util.inspect(data[0].lat);  
-			jsonMongo.lon = util.inspect(data[0].lon); 
-			console.log('lat: ' + jsonMongo.lat);  
-			console.log('lon: ' + jsonMongo.lon);   
-		    } else {
-			var indirizzo2 = jsonMongo.Indirizzo + " " + jsonMongo.N_civico + ", " + jsonMongo.Comune + ", " + jsonMongo.Provincia; 
-			nominatim.search({q: indirizzo2}, function (err2, res2, data2) {       
-				if (err2) throw err2;    
-				if (data2[0] == undefined) {
-				    throw "L'indirizzo specificato nel file non è stato trovato. Modifica l'indirizzo e prova di nuovo a caricare il file. Inserisci le coordinate gps. Per trovare le cordinate GPS usa google maps, clicca con il tasto destro sulla posizione dell'immobile, cliacca su: cosa c'è qui. Esempio: inserisci \" 40.173288, 18.020035\"";
-				} else {
-				    jsonMongo.lat = util.inspect(data2[0].lat);
-				    jsonMongo.lon = util.inspect(data2[0].lon);
-				    console.log('lat2: ' + jsonMongo.lat);    
-				    console.log('lon2: ' + jsonMongo.lon);
-				}  
-				});
-			    } 
-		});
-	    jsonMongo.Nome_File = req.file.filename;
-	    console.log(jsonMongo);
-            var uploadedPerizia = new Perizia(jsonMongo);
-	    uploadedPerizia.save(function(errm) {
-		    if (errm) {
-                        //console.log(err.code);
-                        if (errm.code === 11000){//duplicate key   
-                            console.log(errm.message);
-			    //res.send({message: 'La perizia ' + req.file.filename + ' è già presente nel database.'})
-                            //req.flash('error', 'La perizia ' + req.file.filename + ' è già presente nel database.');
-                            //res.redirect('/upload');
-                            return;
-                        } else {
-			    console.log(errm);
-                        }
-		    } else {
-			console.log('La perizia CRIF ' + req.file.filename + ' è stata salvata in mongo');
-		    }
-		});
+	    } else {
+		console.log('La perizia CRIF ' + json.Nome_File + ' è stata salvata in mongo');
+	    }
 	});
+}
 	
-	pdfParser.loadPDF(uploadDestination + path.sep + req.file.filename);
+
+router.post('/upload', function(req, res){
+	upload(req, res, function(err){
+		if (err){
+		    res.json({error_code:1, err_desc:err});
+		    return;
+		}
+		res.json({error_code:0, err_desc:null});
+		var pdfParser = new PDFParser(this, 1);
+		pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError) );
+		pdfParser.on("pdfParser_dataReady", pdfData => {
+			var jsonPdf = JSON.parse(JSON.stringify(pdfData, null, '\t')).formImage.Pages;
+			var jsonString = parseJsonPdf(jsonPdf);	    	    
+			fs.writeFile(uploadDestination + path.sep + req.file.filename + '.txt', jsonString, function(errf) {
+				if (errf) {
+				    return console.log(errf);
+				}
+				jsonPdf = null;
+			    });	    
+			var jsonMongo = JSON.parse(jsonString);
+			jsonMongo.Nome_File = req.file.filename;
+			//salvaPerizia(jsonMongo);
+
+			//usa Nominatim per ottenere longitudine e latitudine associate al luogo della perizia 
+			//quindi salva la perizia in mongo                               
+			var indirizzo = jsonMongo.Indirizzo + " " + jsonMongo.N_civico + ", " + jsonMongo.Comune + ", " + jsonMongo.Provincia + ", " + jsonMongo.CAP;
+			nominatim.search({q: indirizzo}, function (err, res, data) {
+				console.log(indirizzo);
+				if (err) {
+				    throw err;
+				}
+				var loc = new Array();
+                                if (data != undefined && data[0] != undefined){
+                                    loc = [data[0].lon, data[0].lat];
+				    jsonMongo.loc = loc;  
+				    salvaPerizia(jsonMongo);
+				} else {
+				    var indirizzo2 = jsonMongo.Indirizzo + " " + jsonMongo.N_civico + ", " + jsonMongo.Comune + ", " + jsonMongo.Provincia;
+                                    console.log(indirizzo2);
+				    nominatim.search({q: indirizzo2}, function (err2, res2, data2) {
+                                            if (err2) {
+						throw err2;
+					    }
+                                            if (data2 != undefined && data2[0] != undefined) {
+                                                loc = [data2[0].lon, data2[0].lat];
+						jsonMongo.loc = loc;
+						salvaPerizia(jsonMongo);      
+                                            } else {
+						salvaPerizia(jsonMongo); 
+					    }
+                                        });
+				}
+			    });
+		    });
+		pdfParser.loadPDF(uploadDestination + path.sep + req.file.filename);
+	    })
+	    });
+
+router.get('/id/:_id', function (req, res) {
+	Perizia.findOne({ CRIF: req.params._id }, function (err, perizia) {
+		if (err || !perizia) {
+		    res.render('error', {});
+		} else { 
+		    res.json(perizia);//get json data
+		    console.log(perizia);
+		}
+	    });
+    });
+
+router.get('/file/:Nome_File', function (req, res) {
+	Perizia.findOne({ Nome_File: req.params.Nome_File }, function (err, perizia){
+		console.log("la perizia: " + perizia + ".");
+		if (err || !perizia || perizia == null) {
+		    res.render('error', {});      
+		} else {     
+		    res.json(perizia);//get json data
+		} 
+	    });     
+    });
+
+//need req.query.limit, req.query.DISTANZA, req.query.loc
+router.get('/distanza/:DISTANZA/limite/:limite/data_min/:DATA_MIN/indirizzo/:indirizzo', function (req, res) {
+	console.log('distanza=' + req.params.DISTANZA + ' limite =' + req.params.limite + ' indirizzo=' + req.params.indirizzo);
+	// convert the distance to radians                                    
+	// the radius of Earth is approximately 6371 kilometers
+        var maxDistance = req.params.DISTANZA * 100 / 111.2;
+
+	nominatim.search({q: req.params.indirizzo}, function (err, resp, data) {
+		console.log(req.params.indirizzo);
+		if (err) {
+		    throw err;
+		}
+		console.log(data);
+		if (data != undefined && data[0] != undefined){
+		    var loc = new Array();
+		    loc = [data[0].lon, data[0].lat];
+		    Perizia.find({ 'loc': { $near: loc, $maxDistance: maxDistance }, "Data_Evasione_Perizia": {'$gt': req.params.DATA_MIN }})
+			.limit(Number(req.params.limite))
+			.exec(function(err, perizie) {
+				if (err) {
+				    return res.json(err);
+				}
+				console.log('perizie ' + perizie);				console.log(perizie.length);
+				res.json(perizie);
+			    });
+		}
+	    });
     })
-});
-
-router.get('/upload/:CRIF', function (req, res) {
-	Perizia.findOne({ CRIF: req.params.CRIF },{}, function (err, per) {
-	    if (err || !per) {
-		res.render('error', {});
-	    } else { 
-		res.json(per);//get json data
-            }
-	});
-});
-
-module.exports = router;
+    
+ module.exports = router;

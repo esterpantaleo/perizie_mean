@@ -19,7 +19,7 @@ perizieApp.config(function ($routeProvider) {
 	    templateUrl: 'partials/register.html',
 			controller: 'registerController',
 			access: {restricted: true}
-	})
+		})
 	    .when('/one', {
 		    template: '<h1>This is page one!</h1>',
 			access: {restricted: true}
@@ -46,7 +46,7 @@ perizieApp.config(function ($routeProvider) {
 	    .when('/georicerca', {
 		    templateUrl: 'partials/georicerca.html',
 			controller: 'georicercaController',
-		    access: {restricted: true}
+			access: {restricted: true}
 		})
 	    .otherwise({
 		    redirectTo: '/'

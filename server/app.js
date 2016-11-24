@@ -30,7 +30,6 @@ mongoose.connect(database.url, function(err) {
     if (err) throw err;
 
     // we connected ok
-    //createData();
 });
 
 app.use(function(req, res, next) { //allow cross origin requests
